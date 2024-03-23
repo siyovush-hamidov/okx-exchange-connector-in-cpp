@@ -58,6 +58,14 @@
         "thread": "cpp",
         "variant": "cpp",
         "cstring": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     }
 }
