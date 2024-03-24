@@ -7,6 +7,7 @@
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <curl/curl.h>
+#include <nlohmann/json.hpp>
 
 size_t OKXClass::WriteCallback(void *contents, size_t size, size_t nmemb, std::string *output)
 {
@@ -60,11 +61,46 @@ std::string OKXClass::getCurrentUTCTimestamp()
 
    return oss.str();
 }
+
+void OKXClass::formatAndPrintResponse(const std::string &response_data) const
+{
+   nlohmann::json json_data = nlohmann::json::parse(response_data);
+
+   if (json_data["code"] == "0")
+   {
+      // Extract and format data for asks
+      const auto &asks_data = json_data["data"][0]["asks"];
+      std::cout << "OKXClass: Asks:\n";
+      for (const auto &ask : asks_data)
+      {
+         std::cout << "  Depth Price: " << ask[0] << std::endl;
+         std::cout << "  Quantity: " << ask[1] << std::endl;
+         std::cout << "  Deprecated Value: " << ask[2] << std::endl;
+         std::cout << "  Number of Orders: " << ask[3] << std::endl;
+      }
+
+      // Extract and format data for bids
+      const auto &bids_data = json_data["data"][0]["bids"];
+      std::cout << "OKXClass: Bids:\n";
+      for (const auto &bid : bids_data)
+      {
+         std::cout << "  Depth Price: " << bid[0] << std::endl;
+         std::cout << "  Quantity: " << bid[1] << std::endl;
+         std::cout << "  Deprecated Value: " << bid[2] << std::endl;
+         std::cout << "  Number of Orders: " << bid[3] << std::endl;
+      }
+   }
+   else
+   {
+      std::cerr << "OKXClass: Response Error: " << json_data["msg"] << std::endl;
+   }
+}
+
 void OKXClass::makeRequest() const
 {
    CURL *curl;
    CURLcode res;
-   std::string response_data;
+   const std::string response_data;
 
    // Initialize libcurl
    curl_global_init(CURL_GLOBAL_ALL);
@@ -104,7 +140,7 @@ void OKXClass::makeRequest() const
       headers = curl_slist_append(headers, ("OK-ACCESS-SIGN: " + signature).c_str());
       headers = curl_slist_append(headers, ("OK-ACCESS-TIMESTAMP: " + timestamp).c_str());
       headers = curl_slist_append(headers, ("OK-ACCESS-PASSPHRASE: " + passphrase_).c_str());
-      // headers = curl_slist_append(headers, "Content-Type: application/json"); // Set content type
+   
       curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
       // Perform the request
@@ -115,8 +151,8 @@ void OKXClass::makeRequest() const
       }
       else
       {
-         std::cout << "OKXClass: Response received:\n"
-                   << "OKXClass: " << response_data << std::endl;
+         std::cout << "OKXClass: Response received for " + instId_ + '\n';
+         formatAndPrintResponse(response_data);
       }
 
       // Cleanup
@@ -150,7 +186,5 @@ void OKXClass::run(const OKXClass &client, std::atomic<int> &okxRequestsCount, s
          std::lock_guard<std::mutex> lock(mutex);
          std::cout << "OKXClass: OKX request #" << okxRequestsCount++ << " completed.\n\n";
       }
-      // Optional: You can adjust or remove the sleep duration as needed
-      // std::this_thread::sleep_for(std::chrono::seconds(1)); // Simulate request delay
    }
 }

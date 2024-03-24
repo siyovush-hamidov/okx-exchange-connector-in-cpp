@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 
 CalculationClass::CalculationClass(int size)
 {
@@ -81,6 +82,15 @@ void CalculationClass::printResult()
             std::cout << std::setw(8) << std::setprecision(3) << (fabs(E[i * n + j]) < epsilon ? 0 : E[i * n + j]);
          std::cout << std::setw(8) << "..." << std::setw(8) << std::setprecision(3) << (fabs(E[i * n + n - 1]) < epsilon ? 0 : E[i * n + n - 1]) << '\n';
       }
+      std::cout << '\n';
+      for (int i = 0; i < 7; i++)
+         std::cout << std::setw(8) << "...";
+      std::cout << '\n'
+                << '\n';
+      for (int i = 0; i < 5; i++)
+         std::cout << std::setw(8) << std::setprecision(3) << (fabs(E[n * n + i]) < epsilon ? 0 : E[(n-1) * n + i]);
+      std::cout << std::setw(8) << "..." << std::setw(8) << std::setprecision(3) << (fabs(E[(n - 1) * n + n - 1]) < epsilon ? 0 : E[(n - 1) * n + n - 1]) << '\n';
+      std::cout << '\n';
    }
    else
    {
@@ -112,7 +122,7 @@ void CalculationClass::printEquation()
    else
       for (int i = 0; i < n; i++)
          printRow(i);
-   std::cout << '\n';
+   // std::cout << '\n';
 }
 void CalculationClass::mainElement()
 {
@@ -263,53 +273,64 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
    double variable_for_time;
    try
    {
-      srand(time(0));
-
-      std::cout << "CalculationClass: Matrix " << n << " by " << n << " filled successfully.\n\n";
-      printEquation();
-
-      variable_for_time = clock();
-
-      gaussJordan();
+      auto startTime = std::chrono::steady_clock::now();
+      while (!flag)
       {
-         std::lock_guard<std::mutex> lock(mutex);
-         std::cout << "CalculationClass: Gauss-Jordan completed.\n";
+         srand(time(0));
+
+         auto currentTime = std::chrono::steady_clock::now();
+         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime);
+         if (elapsedTime >= std::chrono::seconds(60))
+         {
+            std::cout << "OKXClass: Maximum duration reached. Stopping...\n";
+            break;
+         }
+
+         variable_for_time = clock();
+         CalculationClass *calculation = new CalculationClass(n);
+         std::cout << "CalculationClass: Matrix " << n << " by " << n << " filled successfully.\n";
          heavyTasksCount++;
+         calculation->printEquation();
+
+         calculation->gaussJordan();
+         {
+            std::lock_guard<std::mutex> lock(mutex);
+            std::cout << "CalculationClass: Gauss-Jordan completed.\n";
+            std::cout << "CalculationClass: Matrix A and Matrix X after the gaussJordan function:\n";
+            calculation->printEquation();
+            heavyTasksCount++;
+         }
+
+         calculation->mainElementTemp();
+         {
+            std::lock_guard<std::mutex> lock(mutex);
+            std::cout << "CalculationClass: Main element calculation completed.\n";
+            heavyTasksCount++;
+         }
+
+         calculation->matrixMultiplication();
+         {
+            std::lock_guard<std::mutex> lock(mutex);
+            std::cout << "CalculationClass: Matrix multiplication completed.\n";
+            std::cout << "CalculationClass: Result of multiplying A (original) by X (after gaussJordan):\n";
+            calculation->printResult();
+            heavyTasksCount++;
+         }
+
+         variable_for_time = clock() - variable_for_time;
+
+         // Calculate accuracy
+         double accuracy;
+         {
+            std::lock_guard<std::mutex> lock(mutex);
+            accuracy = calculation->calculateAccuracy();
+            std::cout << std::scientific << std::setprecision(6) << "CalculationClass: L2 Norm ||AX - E|| = " << accuracy << '\n';
+            heavyTasksCount++;
+         }
+
+         std::cout << "CalculationClass: Calculation time in seconds: " << std::fixed << std::setw(6) << std::setprecision(5) << variable_for_time / CLOCKS_PER_SEC << "\n";
       }
-
-      mainElementTemp();
-      {
-         std::lock_guard<std::mutex> lock(mutex);
-         std::cout << "CalculationClass: Main element calculation completed.\n";
-         heavyTasksCount++;
-      }
-
-      matrixMultiplication();
-      {
-         std::lock_guard<std::mutex> lock(mutex);
-         std::cout << "CalculationClass: Matrix multiplication completed.\n";
-         heavyTasksCount++;
-      }
-
-      variable_for_time = clock() - variable_for_time;
-
-      std::cout << "CalculationClass: Matrix A and Matrix X after the gaussJordan function: \n\n";
-      printEquation();
-
-      std::cout << "CalculationClass: Result of multiplying A (original) by X (after gaussJordan): \n\n";
-      printResult();
-
-      // Calculate accuracy (considered as a heavy task)
-      double accuracy;
-      {
-         std::lock_guard<std::mutex> lock(mutex);
-         accuracy = calculateAccuracy();
-         std::cout << std::scientific << std::setprecision(6) << "CalculationClass: L2 Norm ||AX - E|| = " << accuracy << '\n';
-         heavyTasksCount++;
-      }
-
-      std::cout << "\nCalculationClass: Calculation time in seconds: " << std::fixed << std::setw(6) << std::setprecision(5) << variable_for_time / CLOCKS_PER_SEC << "\n";
-      std::cout << "CalculationClass: Finished!\n";
+      std::cout << "CalculationClass: Finished!\n\n";
    }
    catch (const std::bad_alloc &e)
    {
