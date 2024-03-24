@@ -19,15 +19,12 @@ std::string OKXClass::generateSignature(const std::string &timestamp, const std:
 {
    std::string message = timestamp + method + requestPath;
 
-   // Create a buffer to store the HMAC SHA256 result
    unsigned char digest[EVP_MAX_MD_SIZE];
    unsigned int digestLength;
 
-   // Compute the HMAC SHA256
    HMAC(EVP_sha256(), secretKey.c_str(), secretKey.length(),
         reinterpret_cast<const unsigned char *>(message.c_str()), message.length(), digest, &digestLength);
 
-   // Encode the digest in Base64
    BIO *b64 = BIO_new(BIO_f_base64());
    BIO *bio = BIO_new(BIO_s_mem());
    bio = BIO_push(b64, bio);
@@ -37,23 +34,20 @@ std::string OKXClass::generateSignature(const std::string &timestamp, const std:
    BUF_MEM *bufferPtr;
    BIO_get_mem_ptr(bio, &bufferPtr);
 
-   std::string base64String(bufferPtr->data, bufferPtr->length - 1); // Remove newline character
+   std::string base64String(bufferPtr->data, bufferPtr->length - 1);
    BIO_free_all(bio);
 
    return base64String;
 }
 std::string OKXClass::getCurrentUTCTimestamp()
 {
-   // Get the current time in UTC
    auto now = std::chrono::system_clock::now();
    auto now_time_t = std::chrono::system_clock::to_time_t(now);
    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
 
-   // Convert to struct tm
    std::tm utc_tm;
    gmtime_r(&now_time_t, &utc_tm);
 
-   // Format the timestamp string
    std::ostringstream oss;
    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%S");
    oss << '.' << std::setfill('0') << std::setw(3) << now_ms.count();
@@ -68,7 +62,6 @@ void OKXClass::formatAndPrintResponse(const std::string &response_data) const
 
    if (json_data["code"] == "0")
    {
-      // Extract and format data for asks
       const auto &asks_data = json_data["data"][0]["asks"];
       std::cout << "OKXClass: Asks:\n";
       for (const auto &ask : asks_data)
@@ -79,7 +72,6 @@ void OKXClass::formatAndPrintResponse(const std::string &response_data) const
          std::cout << "  Number of Orders: " << ask[3] << std::endl;
       }
 
-      // Extract and format data for bids
       const auto &bids_data = json_data["data"][0]["bids"];
       std::cout << "OKXClass: Bids:\n";
       for (const auto &bid : bids_data)
@@ -95,26 +87,21 @@ void OKXClass::formatAndPrintResponse(const std::string &response_data) const
       std::cerr << "OKXClass: Response Error: " << json_data["msg"] << std::endl;
    }
 }
-
 void OKXClass::makeRequest() const
 {
    CURL *curl;
    CURLcode res;
    const std::string response_data;
 
-   // Initialize libcurl
    curl_global_init(CURL_GLOBAL_ALL);
    curl = curl_easy_init();
    if (curl)
    {
-      // Set the URL for the request
       curl_easy_setopt(curl, CURLOPT_URL, url_.c_str());
 
-      // Set the callback function to handle response data
       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
 
-      // Generate timestamp
       std::string timestamp = getCurrentUTCTimestamp();
       if (!timestamp.empty())
       {
@@ -126,15 +113,11 @@ void OKXClass::makeRequest() const
          return;
       }
 
-      // Compose message for signature
-      std::string method = "GET";                        // Replace with your actual request method
-      std::string requestPath = "/api/v5/account/bills"; // Replace with your actual request path
-      std::string body = "";                             // Replace with your actual request body if any
+      std::string method = "GET";                        
+      std::string requestPath = "/api/v5/market/books?instId=" + instId_;                           
 
-      // Generate signature
       std::string signature = generateSignature(timestamp, method, requestPath, secret_key_);
 
-      // Set the access key, signature, timestamp, and passphrase in the request headers
       struct curl_slist *headers = NULL;
       headers = curl_slist_append(headers, ("OK-ACCESS-KEY: " + api_key_).c_str());
       headers = curl_slist_append(headers, ("OK-ACCESS-SIGN: " + signature).c_str());
@@ -143,7 +126,6 @@ void OKXClass::makeRequest() const
    
       curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-      // Perform the request
       res = curl_easy_perform(curl);
       if (res != CURLE_OK)
       {
@@ -155,7 +137,6 @@ void OKXClass::makeRequest() const
          formatAndPrintResponse(response_data);
       }
 
-      // Cleanup
       curl_slist_free_all(headers);
       curl_easy_cleanup(curl);
    }
@@ -165,7 +146,6 @@ void OKXClass::makeRequest() const
       return;
    }
 
-   // Cleanup libcurl
    curl_global_cleanup();
 }
 void OKXClass::run(const OKXClass &client, std::atomic<int> &okxRequestsCount, std::mutex &mutex, std::atomic<bool> &flag)

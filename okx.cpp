@@ -14,7 +14,7 @@ int main()
    std::atomic<int> okxRequestsCount(0);
    std::atomic<int> heavyTasksCount(0);
    std::mutex mutex;
-   CalculationClass Calculation(1000);
+   CalculationClass Calculation(750);
 
    char *api_key_env = std::getenv("OKX_API_KEY");
    char *secret_key_env = std::getenv("OKX_SECRET_KEY");

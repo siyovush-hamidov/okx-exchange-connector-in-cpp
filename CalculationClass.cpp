@@ -122,7 +122,6 @@ void CalculationClass::printEquation()
    else
       for (int i = 0; i < n; i++)
          printRow(i);
-   // std::cout << '\n';
 }
 void CalculationClass::mainElement()
 {
@@ -266,7 +265,7 @@ bool CalculationClass::allocateMemory(double **array, int size)
 void CalculationClass::handleMemoryError()
 {
    std::cerr << "Error allocating memory. Program terminating.\n";
-   exit(1); // Exit with an error code (optional)
+   exit(1);
 }
 void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasksCount, std::mutex &mutex)
 {
@@ -319,7 +318,6 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
 
          variable_for_time = clock() - variable_for_time;
 
-         // Calculate accuracy
          double accuracy;
          {
             std::lock_guard<std::mutex> lock(mutex);
