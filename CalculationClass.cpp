@@ -10,21 +10,31 @@ CalculationClass::CalculationClass(int size)
 {
    n = size;
 
-   if (!allocateMemory(&A, n * n + n * n))
-   {
-      handleMemoryError();
-   }
-   if (!allocateMemory(&A_temp, n * n + n * n))
-   {
-      handleMemoryError();
-   }
-   if (!allocateMemory(&E, n * n))
+   if (!(A = (double *)malloc((n * n + n) * sizeof(double))))
    {
       handleMemoryError();
    }
 
-   X = A + n * n;
-   X_temp = A_temp + n * n;
+   if (!(A_temp = (double *)malloc((n * n) * sizeof(double))))
+   {
+      handleMemoryError();
+   }
+
+   if (!(E = (double *)malloc((n * n) * sizeof(double))))
+   {
+      handleMemoryError();
+   }
+
+   if (!(X = (double *)malloc((n * n) * sizeof(double))))
+   {
+      handleMemoryError();
+   }
+
+   if (!(X_temp = (double *)malloc((n * n) * sizeof(double))))
+   {
+      handleMemoryError();
+   }
+
    int i;
 
    for (i = 0; i < n * n; i++)
@@ -88,7 +98,7 @@ void CalculationClass::printResult()
       std::cout << '\n'
                 << '\n';
       for (int i = 0; i < 5; i++)
-         std::cout << std::setw(8) << std::setprecision(3) << (fabs(E[n * n + i]) < epsilon ? 0 : E[(n-1) * n + i]);
+         std::cout << std::setw(8) << std::setprecision(3) << (fabs(E[n * n + i]) < epsilon ? 0 : E[(n - 1) * n + i]);
       std::cout << std::setw(8) << "..." << std::setw(8) << std::setprecision(3) << (fabs(E[(n - 1) * n + n - 1]) < epsilon ? 0 : E[(n - 1) * n + n - 1]) << '\n';
       std::cout << '\n';
    }
@@ -252,21 +262,13 @@ double CalculationClass::calculateAccuracy()
    norma = sqrt(norma);
    return fabs(sqrt(n) - norma);
 }
-bool CalculationClass::allocateMemory(double **array, int size)
-{
-   *array = (double *)malloc(size * sizeof(double));
-   if (!(*array))
-   {
-      std::cerr << "Error allocating memory for matrix!\n";
-      return false;
-   }
-   return true;
-}
+
 void CalculationClass::handleMemoryError()
 {
    std::cerr << "Error allocating memory. Program terminating.\n";
    exit(1);
 }
+
 void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasksCount, std::mutex &mutex)
 {
    double variable_for_time;

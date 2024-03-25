@@ -9,7 +9,6 @@ private:
     int n;
     double *A, *X, *A_temp, *X_temp, *E;
     void printRow(int i);
-    bool allocateMemory(double **array, int size);
     void handleMemoryError();
 
 public:
