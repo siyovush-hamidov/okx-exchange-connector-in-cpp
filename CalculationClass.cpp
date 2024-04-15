@@ -10,7 +10,7 @@ CalculationClass::CalculationClass(int size)
 {
    n = size;
 
-   if (!(A = (double *)malloc((n * n + n) * sizeof(double))))
+   if (!(A = (double *)malloc((n * n) * sizeof(double))))
    {
       handleMemoryError();
    }

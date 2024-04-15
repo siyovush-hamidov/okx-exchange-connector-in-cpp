@@ -66,6 +66,7 @@
         "ranges": "cpp",
         "valarray": "cpp",
         "condition_variable": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "fstream": "cpp"
     }
 }

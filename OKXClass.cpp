@@ -114,7 +114,8 @@ void OKXClass::makeRequest() const
       }
 
       std::string method = "GET";                        
-      std::string requestPath = "/api/v5/market/books?instId=" + instId_;                           
+      std::string requestPath = "/api/v5/market/books?instId=" + instId_;
+      // std::string requestPath = "/users/self/verify";                   
 
       std::string signature = generateSignature(timestamp, method, requestPath, secret_key_);
 
