@@ -19,7 +19,10 @@ This repository contains a C++ application that accomplishes the following tasks
 1. Clone the repository to your local machine.
 2. Compile the C++ files using your preferred C++ compiler (e.g., g++):
      ```
-     g++ okx.cpp -o okx CalculationClass.cpp OKXClass.cpp -lcurl -lssl -lcrypto
+     REST:
+     g++ main.cpp -o main CalculationClass.cpp OKXClass.cpp -lcurl -lssl -lcrypto
+     WebSocket:
+     g++ main.cpp -o main CalculationClass.cpp WebSocketClass.cpp -lssl -lcrypto
      ```
 4. Run the compiled executable.
 
