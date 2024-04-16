@@ -24,23 +24,24 @@ This repository contains a C++ application that accomplishes the following tasks
 4. Run the compiled executable.
 
 ## Files Structure
-
+```
 - REST
   - main.cpp
   - CalculationClass.h
   - CalculationClass.cpp
   - OKXClass.h
   - OKXClass.cpp
-In the `REST` folder:
-- `main.cpp`: Contains the main program logic for the REST implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
-- `CalculationClass.h` and `CalculationClass.cpp`: Define and implement the `CalculationClass`, which handles the difficult calculation task.
-- `OKXClass.h` and `OKXClass.cpp`: Define and implement the `OKXClass`, which connects to the OKX Crypto Exchange API using REST via libcurl.
 - WebSocket
   - main.cpp
   - CalculationClass.h
   - CalculationClass.cpp
   - WebSocketClass.h
   - WebSocketClass.cpp
+```
+In the `REST` folder:
+- `main.cpp`: Contains the main program logic for the REST implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
+- `CalculationClass.h` and `CalculationClass.cpp`: Define and implement the `CalculationClass`, which handles the difficult calculation task.
+- `OKXClass.h` and `OKXClass.cpp`: Define and implement the `OKXClass`, which connects to the OKX Crypto Exchange API using REST via libcurl.
 In the `WebSocket` folder:
 - `main.cpp`: Contains the main program logic for the WebSocket implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
 - `CalculationClass.h` and `CalculationClass.cpp`: Define and implement the `CalculationClass`, which handles the difficult calculation task.
