@@ -31,12 +31,14 @@ This repository contains a C++ application that accomplishes the following tasks
   - CalculationClass.cpp
   - OKXClass.h
   - OKXClass.cpp
+  - Recycle Bin (contains additional files)
 - WebSocket
   - main.cpp
   - CalculationClass.h
   - CalculationClass.cpp
   - WebSocketClass.h
   - WebSocketClass.cpp
+  - Recycle Bin (contains additional files)
 ```
 In the `REST` folder:
 - `main.cpp`: Contains the main program logic for the REST implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
