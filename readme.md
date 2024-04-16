@@ -43,11 +43,12 @@ This repository contains a C++ application that accomplishes the following tasks
   - WebSocketClass.cpp
   - Recycle Bin (contains additional files)
 ```
-In the `REST` folder:
+### In the `REST` folder:
 - `main.cpp`: Contains the main program logic for the REST implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
 - `CalculationClass.h` and `CalculationClass.cpp`: Define and implement the `CalculationClass`, which handles the difficult calculation task.
 - `OKXClass.h` and `OKXClass.cpp`: Define and implement the `OKXClass`, which connects to the OKX Crypto Exchange API using REST via libcurl.
-In the `WebSocket` folder:
+
+### In the `WebSocket` folder:
 - `main.cpp`: Contains the main program logic for the WebSocket implementation, including the simultaneous execution of the OKX API connector and the difficult calculation task.
 - `CalculationClass.h` and `CalculationClass.cpp`: Define and implement the `CalculationClass`, which handles the difficult calculation task.
 - `WebSocketClass.h` and `WebSocketClass.cpp`: Define and implement the `WebSocketClass`, which connects to the OKX Crypto Exchange API using WebSocket via the WebSocket++ library.
