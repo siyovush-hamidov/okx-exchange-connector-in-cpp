@@ -280,42 +280,27 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
          variable_for_time = clock();
          CalculationClass *calculation = new CalculationClass(n);
          std::cout << "CalculationClass: Matrix " << n << " by " << n << " filled successfully.\n";
-         heavyTasksCount++;
          calculation->printEquation();
-
          calculation->gaussJordan();
-         {
-            std::lock_guard<std::mutex> lock(mutex);
-            std::cout << "CalculationClass: Gauss-Jordan completed.\n";
-            std::cout << "CalculationClass: Matrix A and Matrix X after the gaussJordan function:\n";
-            calculation->printEquation();
-            heavyTasksCount++;
-         }
-
+         std::cout << "CalculationClass: Gauss-Jordan completed.\n";
+         std::cout << "CalculationClass: Matrix A and Matrix X after the gaussJordan function:\n";
+         calculation->printEquation();
          calculation->mainElementTemp();
-         {
-            std::lock_guard<std::mutex> lock(mutex);
-            std::cout << "CalculationClass: Main element calculation completed.\n";
-         }
-
+         std::cout << "CalculationClass: Main element calculation completed.\n";
          calculation->matrixMultiplication();
-         {
-            std::lock_guard<std::mutex> lock(mutex);
-            std::cout << "CalculationClass: Matrix multiplication completed.\n";
-            std::cout << "CalculationClass: Result of multiplying A (original) by X (after gaussJordan):\n";
-            calculation->printResult();
-         }
+         std::cout << "CalculationClass: Matrix multiplication completed.\n";
+         std::cout << "CalculationClass: Result of multiplying A (original) by X (after gaussJordan):\n";
+         calculation->printResult();
 
          variable_for_time = clock() - variable_for_time;
 
          double accuracy;
+         accuracy = calculation->calculateAccuracy();
+         std::cout << std::scientific << std::setprecision(6) << "CalculationClass: L2 Norm ||AX - E|| = " << accuracy << '\n';
          {
             std::lock_guard<std::mutex> lock(mutex);
-            accuracy = calculation->calculateAccuracy();
-            std::cout << std::scientific << std::setprecision(6) << "CalculationClass: L2 Norm ||AX - E|| = " << accuracy << '\n';
-            std::cout << "CalculationClass: Calculation #" << heavyTasksCount << std::endl;
+            std::cout << "CalculationClass: Calculation #" << heavyTasksCount++ << std::endl;
          }
-
          std::cout << "CalculationClass: Calculation time in seconds: " << std::fixed << std::setw(6) << std::setprecision(5) << variable_for_time / CLOCKS_PER_SEC << "\n";
       }
       std::cout << "CalculationClass: Finished!\n\n";

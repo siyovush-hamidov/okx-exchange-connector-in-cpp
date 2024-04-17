@@ -17,7 +17,6 @@ using client = websocketpp::client<websocketpp::config::asio_tls_client>;
 using context_ptr = std::shared_ptr<boost::asio::ssl::context>;
 using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
-// using websocketpp::lib::placeholders::_2;
 using message_ptr = websocketpp::config::asio_client::message_type::ptr; 
 
 class WebSocketClass

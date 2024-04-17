@@ -34,7 +34,7 @@ void WebSocketClass::on_message(const std::string &response_data)
         {
             const auto &asks_data = data[0]["asks"];
             std::cout << "WebSocketClass: Asks:\n";
-            for (const auto &ask : asks_data)
+            for (const auto ask : asks_data)
             {
                 std::cout << "  Depth Price: " << ask[0] << std::endl;
                 std::cout << "  Quantity: " << ask[1] << std::endl;
@@ -59,19 +59,18 @@ void WebSocketClass::on_message(const std::string &response_data)
         }
         else
         {
-            std::cerr << "No data available in the response." << std::endl;
+            std::cerr << "WebSocketClass: No data available in the response." << std::endl;
         }
     }
     else
     {
-        std::cerr << "Invalid response format." << std::endl;
+        std::cerr << "WebSocketClass: Invalid response format." << std::endl;
     }
 }
 
 context_ptr WebSocketClass::on_tls_init()
 {
     context_ptr ctx = std::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
-
     try
     {
         ctx->set_options(boost::asio::ssl::context::default_workarounds |
@@ -81,7 +80,7 @@ context_ptr WebSocketClass::on_tls_init()
     }
     catch (std::exception &e)
     {
-        std::cout << "Error in context pointer: " << e.what() << std::endl;
+        std::cout << "WebSocketClass: Error in context pointer: " << e.what() << std::endl;
     }
     return ctx;
 }
@@ -93,7 +92,7 @@ void WebSocketClass::on_open(client *m_client, websocketpp::connection_hdl hdl)
     m_client->send(hdl, subscribe_msg, websocketpp::frame::opcode::text, ec);
     if (ec)
     {
-        std::cout << "subscription failed: " << ec.message() << std::endl;
+        std::cout << "WebSocketClass: subscription failed: " << ec.message() << std::endl;
     }
 }
 
@@ -118,7 +117,7 @@ void WebSocketClass::wsrun(std::atomic<bool> &flag)
         client::connection_ptr con = m_client.get_connection(m_uri, ec);
         if (ec)
         {
-            std::cout << "could not create connection because: " << ec.message() << std::endl;
+            std::cout << "WebSocketClass: could not create connection because: " << ec.message() << std::endl;
             return;
         }
         m_client.connect(con);
