@@ -13,13 +13,12 @@
 #include <atomic>
 #include <mutex>
 
-typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
-typedef std::shared_ptr<boost::asio::ssl::context> context_ptr;
+using client = websocketpp::client<websocketpp::config::asio_tls_client>;
+using context_ptr = std::shared_ptr<boost::asio::ssl::context>;
 using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;
-
-typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
+// using websocketpp::lib::placeholders::_2;
+using message_ptr = websocketpp::config::asio_client::message_type::ptr; 
 
 class WebSocketClass
 {
@@ -30,7 +29,7 @@ private:
     static std::string getCurrentUTCTimestamp();
     static void on_message(const std::string &response_data);
     static context_ptr on_tls_init();
-    static void on_open(client *c, websocketpp::connection_hdl hdl);
+    static void on_open(client *m_client, websocketpp::connection_hdl hdl);
 
 public:
     WebSocketClass(const std::string &uri, std::atomic<int> &WebSocketRequestsCount, std::mutex &mutex);

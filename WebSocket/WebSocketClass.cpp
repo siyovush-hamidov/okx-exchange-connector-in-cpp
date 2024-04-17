@@ -23,7 +23,7 @@ std::string WebSocketClass::getCurrentUTCTimestamp()
 void WebSocketClass::on_message(const std::string &response_data)
 {
     std::string timestamp = getCurrentUTCTimestamp();
-    std::cout << "Timestamp: " << timestamp << std::endl;
+    std::cout << "WebSocketClass: Timestamp: " << timestamp << std::endl;
 
     nlohmann::json json_data = nlohmann::json::parse(response_data);
 
@@ -33,18 +33,17 @@ void WebSocketClass::on_message(const std::string &response_data)
         if (data.is_array() && !data.empty())
         {
             const auto &asks_data = data[0]["asks"];
-            std::cout << "Asks:\n";
+            std::cout << "WebSocketClass: Asks:\n";
             for (const auto &ask : asks_data)
             {
                 std::cout << "  Depth Price: " << ask[0] << std::endl;
                 std::cout << "  Quantity: " << ask[1] << std::endl;
                 std::cout << "  Deprecated Value: " << ask[2] << std::endl;
-                std::cout << "  Number of Orders: " << ask[3] << std::endl
-                          << std::endl;
+                std::cout << "  Number of Orders: " << ask[3] << std::endl;
             }
 
             const auto &bids_data = data[0]["bids"];
-            std::cout << "Bids:\n";
+            std::cout << "WebSocketClass: Bids:\n";
             for (const auto &bid : bids_data)
             {
                 std::cout << "  Depth Price: " << bid[0] << std::endl;
@@ -55,7 +54,7 @@ void WebSocketClass::on_message(const std::string &response_data)
             {
                 std::lock_guard<std::mutex> lock(m_mutex);
                 m_WebSocketRequestsCount++;
-                std::cout << "Request # " << m_WebSocketRequestsCount << "\n\n";
+                std::cout << "WebSocketClass: Request # " << m_WebSocketRequestsCount << " completed\n\n";
             }
         }
         else
@@ -87,11 +86,11 @@ context_ptr WebSocketClass::on_tls_init()
     return ctx;
 }
 
-void WebSocketClass::on_open(client *c, websocketpp::connection_hdl hdl)
+void WebSocketClass::on_open(client *m_client, websocketpp::connection_hdl hdl)
 {
     std::string subscribe_msg = R"({"op":"subscribe","args":[{"channel":"bbo-tbt","instId":"BTC-USDT"}]})";
     websocketpp::lib::error_code ec;
-    c->send(hdl, subscribe_msg, websocketpp::frame::opcode::text, ec);
+    m_client->send(hdl, subscribe_msg, websocketpp::frame::opcode::text, ec);
     if (ec)
     {
         std::cout << "subscription failed: " << ec.message() << std::endl;
@@ -108,7 +107,7 @@ WebSocketClass::WebSocketClass(const std::string &uri, std::atomic<int> &WebSock
 
     m_client.set_message_handler([this](websocketpp::connection_hdl hdl, message_ptr msg)
                                  { on_message(msg->get_payload()); });
-    m_client.set_open_handler(websocketpp::lib::bind(&on_open, &m_client, ::_1)); // Add open handler
+    m_client.set_open_handler(bind(&on_open, &m_client, ::_1));
 }
 
 void WebSocketClass::wsrun(std::atomic<bool> &flag)
@@ -127,6 +126,7 @@ void WebSocketClass::wsrun(std::atomic<bool> &flag)
         while (!flag)
         {
             m_client.run_one();
+            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
             m_client.get_io_service().run_one();
         }
 

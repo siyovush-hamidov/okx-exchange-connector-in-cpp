@@ -296,7 +296,6 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
          {
             std::lock_guard<std::mutex> lock(mutex);
             std::cout << "CalculationClass: Main element calculation completed.\n";
-            heavyTasksCount++;
          }
 
          calculation->matrixMultiplication();
@@ -305,7 +304,6 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
             std::cout << "CalculationClass: Matrix multiplication completed.\n";
             std::cout << "CalculationClass: Result of multiplying A (original) by X (after gaussJordan):\n";
             calculation->printResult();
-            heavyTasksCount++;
          }
 
          variable_for_time = clock() - variable_for_time;
@@ -315,7 +313,7 @@ void CalculationClass::run(std::atomic<bool> &flag, std::atomic<int> &heavyTasks
             std::lock_guard<std::mutex> lock(mutex);
             accuracy = calculation->calculateAccuracy();
             std::cout << std::scientific << std::setprecision(6) << "CalculationClass: L2 Norm ||AX - E|| = " << accuracy << '\n';
-            heavyTasksCount++;
+            std::cout << "CalculationClass: Calculation #" << heavyTasksCount << std::endl;
          }
 
          std::cout << "CalculationClass: Calculation time in seconds: " << std::fixed << std::setw(6) << std::setprecision(5) << variable_for_time / CLOCKS_PER_SEC << "\n";
